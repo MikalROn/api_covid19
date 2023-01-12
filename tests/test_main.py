@@ -1,13 +1,16 @@
 import pytest
 import pandas as pd
-import requests as r
+from fastapi.testclient import TestClient
+from api import app
+from api import inicio
 
+client = TestClient(app)
 
 class Test:
-
-    def test_if_api_is_oline(self):
-        req = r.get('http://127.0.0.1:8000')
-        assert req.status_code == 200
+    def test_read_root(self):
+        response = client.get('/')
+        assert response.status_code == 200
+        assert response.json() == inicio
 
     def test_get_all_countries(self):
         entrada = pd.read_json('http://127.0.0.1:8000/all_countries')[0].tolist()
@@ -48,5 +51,5 @@ class Test:
                     'United Kingdom', 'United States', 'United States Virgin Islands',
                     'Uruguay', 'Uzbekistan', 'Vanuatu', 'Vatican', 'Venezuela', 'Vietnam',
                     'Wales', 'Wallis and Futuna', 'Western Sahara', 'Yemen', 'Zambia', 'Zimbabwe']
-
+        assert client.get('/all_contries').status_code == 200
         assert esperado == entrada

@@ -1,16 +1,18 @@
 from fastapi import FastAPI
 from dados import DataCovid
+import uvicorn
 
 app = FastAPI()
 
 
-@app.get('/')
-def read_all_countries():
-    return {'Comandos': {
+inicio = {'Comandos': {
         'all_contries': 'retorna todos os paises presentes no data frame',
         '/nome_país/covid': 'retorna dados filtrados por país',
-        'dados': 'retorna todos os dados'
-                         }}
+        'dados': 'retorna todos os dados'}}
+
+@app.get('/')
+def read_root():
+    return inicio
 
 
 @app.get('/all_countries')
