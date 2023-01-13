@@ -1,32 +1,38 @@
 from fastapi import FastAPI
+from fastapi.openapi.docs import get_redoc_html
+from fastapi.responses import HTMLResponse, JSONResponse
+from exeptions import CountryNotFound
 from dados import DataCovid
-import uvicorn
-
-app = FastAPI()
 
 
-inicio = {'Comandos': {
-        'all_contries': 'retorna todos os paises presentes no data frame',
-        '/nome_país/covid': 'retorna dados filtrados por país',
-        'dados': 'retorna todos os dados'}}
+app: FastAPI = FastAPI()
 
+# Rotas
 @app.get('/')
 def read_root():
-    return inicio
+    return HTMLResponse(get_redoc_html(openapi_url='/', title='myapi'))
 
 
 @app.get('/all_countries')
-def read_all_countries():
+async def read_all_countries():
     dados = DataCovid()
-    return dados.get_all_countries
+    return JSONResponse(content=dados.get_all_countries, status_code=200)
 
 
 @app.get('/{country}/covid')
-def read_data_of_contry(country):
+async def read_data_of_contry(country):
     dados = DataCovid()
-    return dados.get_covid_data_by_country(country)
+    if country in dados.get_all_countries:
+        return JSONResponse(content=dados.get_covid_data_by_country(country), status_code=200)
+    else:
+        raise CountryNotFound(country)
 
 @app.get('/dados')
-def read_data_of_contry():
+async def read_data_of_contry():
     dados = DataCovid()
-    return dados.get_full_data
+    return JSONResponse(content=dados.get_full_data, status_code=200)
+
+# Exeptions
+@app.exception_handler(CountryNotFound)
+async def handle_country_not_found(request, exc):
+    return JSONResponse(content={"error": exc.message}, status_code=exc.status_code)

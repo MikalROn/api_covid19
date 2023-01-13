@@ -1,12 +1,12 @@
 import pandas as pd
-import os
-
+from sqlalchemy import create_engine
 
 class DataCovid:
     """ Classe que busca e filtra os dados """
 
     def __init__(self):
-        self._dados = pd.read_csv('dados/df_covid19_countries.csv')
+        self._engine = create_engine(f'mysql+pymysql://root:191145@127.0.0.1/api_covid')
+        self._dados = pd.read_sql('SELECT * FROM covid;', self._engine)
         self._all_countries = self._dados['location'].unique().tolist()
 
     @property
