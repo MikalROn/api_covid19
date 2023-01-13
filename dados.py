@@ -4,8 +4,8 @@ from sqlalchemy import create_engine
 class DataCovid:
     """ Classe que busca e filtra os dados """
 
-    def __init__(self):
-        self._engine = create_engine(f'mysql+pymysql://root:191145@127.0.0.1/api_covid')
+    def __init__(self, engine):
+        self._engine = engine
         self._dados = pd.read_sql('SELECT * FROM covid;', self._engine)
         self._all_countries = self._dados['location'].unique().tolist()
 

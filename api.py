@@ -3,10 +3,11 @@ from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse, JSONResponse
 from exeptions import CountryNotFound
 from dados import DataCovid
-
+from sqlalchemy import create_engine
 
 app: FastAPI = FastAPI()
 
+engine = create_engine('mysql+pymysql://root:191145@127.0.0.1/api_covid')
 # Rotas
 @app.get('/')
 def read_root():
@@ -15,13 +16,13 @@ def read_root():
 
 @app.get('/all_countries')
 async def read_all_countries():
-    dados = DataCovid()
+    dados = DataCovid(engine)
     return JSONResponse(content=dados.get_all_countries, status_code=200)
 
 
 @app.get('/{country}/covid')
 async def read_data_of_contry(country):
-    dados = DataCovid()
+    dados = DataCovid(engine)
     if country in dados.get_all_countries:
         return JSONResponse(content=dados.get_covid_data_by_country(country), status_code=200)
     else:
@@ -29,7 +30,7 @@ async def read_data_of_contry(country):
 
 @app.get('/dados')
 async def read_data_of_contry():
-    dados = DataCovid()
+    dados = DataCovid(engine)
     return JSONResponse(content=dados.get_full_data, status_code=200)
 
 # Exeptions
