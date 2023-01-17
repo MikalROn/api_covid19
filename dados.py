@@ -1,5 +1,5 @@
 import pandas as pd
-from sqlalchemy import create_engine
+
 
 class DataCovid:
     """ Classe que busca e filtra os dados """
