@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_redoc_html
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from exeptions import CountryNotFound
 from dados import DataCovid
 from sqlalchemy import create_engine
@@ -8,11 +8,16 @@ from sqlalchemy import create_engine
 app: FastAPI = FastAPI()
 
 engine = create_engine('mysql+pymysql://root:191145@127.0.0.1/api_covid')
+
 # Rotas
+
 @app.get('/')
 def read_root():
-    return HTMLResponse(get_redoc_html(openapi_url='/', title='myapi'))
+    return RedirectResponse('/docs')
 
+@app.get('/docs')
+def read_docs():
+    return HTMLResponse(content=get_redoc_html(openapi_url='/docs', title='my_api'))
 
 @app.get('/all_countries')
 async def read_all_countries():
